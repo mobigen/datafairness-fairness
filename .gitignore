@@ -1,0 +1,14 @@
+# for all test
+test*
+tmp*
+
+# MacOS
+*.DS_Store
+
+# swap
+*.swp
+
+# IDE
+__pycache__/
+.idea/
+.vscode/
