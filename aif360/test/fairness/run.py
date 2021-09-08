@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 
 # dataset
@@ -10,27 +9,26 @@ from aif360.metrics import BinaryLabelDatasetMetric
 # mitigation algorithms
 from aif360.algorithms.preprocessing import Reweighing
 
-from config import *
 
-data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
-data_path = os.path.join(data_dir, 'german.csv')
+# todo: config.py -> yaml로 general/user 부분 분리
+#   load config, convert python function.
+#   use-case 고려
+from conf.config import *
 
 df = pd.read_csv(data_path)
 
 
 dataset = StandardDataset(
-    df=df, label_name=label_name,
+    df=df,
+    label_name=label_name,
     favorable_classes=favorable_classes,
     protected_attribute_names=protected_attribute_names,
     privileged_classes=privileged_classes,
 
-    # instance_weights_name=instance_weights_name,
     categorical_features=categorical_features,
-    # features_to_keep=features_to_keep,
+    features_to_keep=features_to_keep,
     features_to_drop=features_to_drop,
-    # na_values=na_values,
-    custom_preprocessing=custom_preprocessing,
-    # metadata=metadata
+    custom_preprocessing=custom_preprocessing
 )
 
 

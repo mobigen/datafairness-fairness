@@ -1,3 +1,10 @@
+import os
+
+
+# set input
+data_dir = '/Users/psc/workspace/projects/2021/data-fairness/src/git/datafairness-fairness/aif360/test/data'
+data_path = os.path.join(data_dir, 'german.csv')
+
 # set df env
 label_name = 'credit'       # model label values (column name)
 favorable_classes = [1]     # mapped to 1(favorable), 0(unfavorable)
@@ -25,13 +32,6 @@ def custom_preprocessing(df):   # f: DataFrame -> DataFrame. default is None
 
     return df
 
-
-german_mappings = {
-    'label_maps': [{1.0: 'Good Credit', 2.0: 'Bad Credit'}],
-    'protected_attribute_maps': [{1.0: 'Male', 0.0: 'Female'},
-                                 {1.0: 'Old', 0.0: 'Young'}],
-}
-metadata = german_mappings
 
 
 # SELECT BIAS METRICS

@@ -1,0 +1,49 @@
+input:
+#  type: file
+#    target: $FILE_PATH
+#    delimiter: , # (optional. default is ",")
+#  type: db
+#    target: $TABLE_NAME
+##    (db connection conf, database name depends on "_general_config.yaml"
+  type: file
+  target: /usr/local/Caskroom/miniconda/base/envs/data-fairness/lib/python3.7/site-packages/aif360/data/raw/german/german.csv
+
+data_env:
+  label:
+    name: credit
+    favorable_classes:
+      - 1
+  protected_attributes:
+    - name: sex
+      privileged_classes:
+        - male
+    - name: age
+      privileged_classes:
+        - "x > 25"
+  categorical_features:
+    - status
+    - credit_history
+    - purpose
+    - savings
+    - employment
+    - other_debtors
+    - property
+    - installment_plans
+    - housing
+    - skill_level
+    - telephone
+    - foreign_worker
+  features_to_keep:
+  features_to_drop:
+
+  # todo: DataFrame -> DataFrame python Function
+  # chk: 시나리오(?)
+  #   "func" 이름의 함수 정의(?) -> conf/custom_preprocessing/custom_preprocessing.py write
+  #   validate function ~ input/output type, try/except, ..
+  custom_preprocessing: |-
+    def func(df):   # f: DataFrame -> DataFrame. default is None
+        status_map = {'A91': 'male', 'A93': 'male', 'A94': 'male',
+                      'A92': 'female', 'A95': 'female'}
+        df['sex'] = df['personal_status'].replace(status_map)
+
+        return df
