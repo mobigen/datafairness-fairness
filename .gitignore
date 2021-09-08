@@ -1,5 +1,4 @@
 # for all test
-test*
 tmp*
 
 # MacOS
@@ -14,3 +13,5 @@ __pycache__/
 .vscode/
 .ipynb_checkpoints/
 
+/aif360/test/data/data2df.py
+/aif360/oreilly-tutorial/tutorial_files.zip
