@@ -1,0 +1,12 @@
+#db:
+#  dialect: iris
+#  addr: 192.168.101.108
+#  user: untact
+#  password: !cool@untact#4
+#  database: UNTACT
+db:
+  dialect: mysql
+  addr: 192.168.100.210
+  user: root
+  password: pwd123
+  database: fairness

@@ -1,62 +1,84 @@
 import os
+import yaml
 
 
-# set input
-data_dir = '/Users/psc/workspace/projects/2021/data-fairness/src/git/datafairness-fairness/aif360/test/data'
-data_path = os.path.join(data_dir, 'german.csv')
+class Config:
+    def __init__(self, general_config_path, user_config_path):
+        self.base_config_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'conf')
 
-# set df env
-label_name = 'credit'       # model label values (column name)
-favorable_classes = [1]     # mapped to 1(favorable), 0(unfavorable)
-protected_attribute_names = ['sex', 'age']  # evaluate columns
-privileged_classes = [['male'], lambda x: x > 25]   # each of privileged classes of protected attributes
+        self.general_config_path = general_config_path \
+            if general_config_path else os.path.join(self.base_config_dir, 'general_config.yaml')
+        self.user_config_path = user_config_path \
+            if user_config_path else os.path.join(self.base_config_dir, 'user_config.yaml')
 
+        with open(self.general_config_path, 'r') as fd:
+            self.general_config = yaml.load(fd)
+        with open(self.user_config_path, 'r') as fd:
+            self.user_config = yaml.load(fd)
 
-## optional
-categorical_features = [
-    'status', 'credit_history', 'purpose',
-    'savings', 'employment', 'other_debtors', 'property',
-    'installment_plans', 'housing', 'skill_level', 'telephone',
-    'foreign_worker'
-]   # categorical feature names (column names) (able to expanded one-hot vector)
-features_to_keep = []   # column names to keep.
-                        # (all others are dropped except those present in
-                        #    `protected_attribute_names`, `categorical_features`, `label_name` or `instance_weights_name`)
-features_to_drop = ['personal_status']  # column names to drop.
+        self.general_config_validation()
+        self.user_config_validation()
 
+        self.dataset_config = self.get_dataset_config()
+        self.metric_config = self.get_metric_config()
+        self.mitigation_config = self.get_mitigation_config()
 
-def custom_preprocessing(df):   # f: DataFrame -> DataFrame. default is None
-    status_map = {'A91': 'male', 'A93': 'male', 'A94': 'male',
-                  'A92': 'female', 'A95': 'female'}
-    df['sex'] = df['personal_status'].replace(status_map)
+    def general_config_validation(self):
+        pass
 
-    return df
+    def user_config_validation(self):
+        pass
 
+    def get_dataset_config(self):
+        def _privileged_classes(privileged_classes):
+            if isinstance(privileged_classes, str):
+                if privileged_classes.startswith('eval:'):
+                    return eval(f'lambda x: {privileged_classes.split(":")[-1]}')
+            if not isinstance(privileged_classes, list):
+                return [privileged_classes]
+            else:
+                return privileged_classes
 
+        def _convert_to_list(to_list_config):
+            if isinstance(to_list_config, list):
+                return to_list_config
+            elif not to_list_config:
+                return []
+            else:
+                return [to_list_config]
 
-# SELECT BIAS METRICS
+        # todo: custom_preprocessing ~ validation: callable, input/output=DataFrame
+        exec(self.user_config['dataset']['custom_preprocessing'], globals())
+        if 'custom_preprocessing' in globals():
+            custom_preprocessing = globals()['custom_preprocessing']
+        else:
+            custom_preprocessing = None
 
-# # 세종대
-# Average Odds Difference
-# Equal Opportunity Difference
-# Statistical Parity Difference
-#
-# # aif360 tutorial
-# Statistical Parity Difference
-# Equal Opportunity Difference
-# Average Odds Difference
-# Disparate Impact
-# Theil Index
+        dataset_config = {
+            'label_name': self.user_config['dataset']['label']['name'],
+            'favorable_classes': self.user_config['dataset']['label']['favorable_classes'],
+            'protected_attribute_names': [attr['name'] for attr in self.user_config['dataset']['protected_attributes']],
+            'privileged_classes': [_privileged_classes(attr['privileged_classes']) for attr in self.user_config['dataset']['protected_attributes']],
+            'categorical_features': _convert_to_list(self.user_config['dataset']['categorical_features']),
+            'features_to_keep': _convert_to_list(self.user_config['dataset']['features_to_keep']),
+            'features_to_drop': _convert_to_list(self.user_config['dataset']['features_to_drop']),
+            'custom_preprocessing': custom_preprocessing
+        }
 
+        return dataset_config
 
+    def get_metric_config(self):
+        metric_config = {
+            'privileged_groups': self.user_config['metric']['privileged_groups'],
+            'unprivileged_groups': self.user_config['metric']['unprivileged_groups']
+        }
+        return metric_config
 
-
-# SELECT MITIGATION ALGORITHMS
-
-# # aif360 tutorial
-# [pre-process] Reweighing
-# [pre-process] Optimized Pre-Processing
-# [in-process] Adversarial Debiasing
-# [post-process] Reject Option Based Classification
+    def get_mitigation_config(self):
+        mitigation_config = {
+            'privileged_groups': self.user_config['metric']['privileged_groups'],
+            'unprivileged_groups': self.user_config['metric']['unprivileged_groups']
+        }
+        return mitigation_config
 
 

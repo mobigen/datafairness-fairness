@@ -1,6 +1,0 @@
-db:
-  type: iris
-  addr: 192.168.101.108
-  user: untact
-  password: !cool@untact#4
-  database: UNTACT
