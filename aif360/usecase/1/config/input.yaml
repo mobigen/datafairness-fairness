@@ -1,7 +1,8 @@
 # type: file -> target: ${file_path}
 # type: db -> target: ${table_name}
 type: file
-target: /Users/psc/workspace/projects/2021/data-fairness/src/git/datafairness-fairness/aif360/data/german.csv
+#target: /Users/psc/workspace/projects/2021/data-fairness/src/git/datafairness-fairness/aif360/data/german.csv
+target: ../sample_data/german.csv
 
 # if type is file, db config is not necessary.
 db:
