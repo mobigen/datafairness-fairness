@@ -6,7 +6,7 @@ input:
   #    target: $TABLE_NAME
   ##    (db connection conf, database name depends on "general_config.yaml"
   type: file
-  target: /Users/psc/workspace/projects/2021/data-fairness/src/git/datafairness-fairness/aif360/test/data/german.csv
+  target: /Users/psc/workspace/projects/2021/data-fairness/src/git/datafairness-fairness/aif360/data/german.csv
 
 dataset:
   label:
@@ -55,3 +55,11 @@ metric:
     - age: 1
   unprivileged_groups:
     - age: 0
+  metrics:
+    - mean_difference
+    - statistical_parity_difference
+    - disparate_impact
+
+mitigation:
+  algorithms:
+    - reweighing

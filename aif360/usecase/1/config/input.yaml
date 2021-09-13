@@ -1,0 +1,12 @@
+# type: file -> target: ${file_path}
+# type: db -> target: ${table_name}
+type: file
+target: /Users/psc/workspace/projects/2021/data-fairness/src/git/datafairness-fairness/aif360/data/german.csv
+
+# if type is file, db config is not necessary.
+db:
+  dialect: mysql
+  addr: 192.168.100.210
+  user: root
+  password: pwd123
+  database: fairness
