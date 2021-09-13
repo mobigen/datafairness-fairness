@@ -44,4 +44,3 @@ dataset_new = mitigation.reweighing()
 # check bias metrics (after mitigation)
 metrics_new = Metric(dataset_new, config.metric_config).compute_metrics()
 pretty_print(metrics_new, 'Mitigated Metrics ~ Reweighing')
-

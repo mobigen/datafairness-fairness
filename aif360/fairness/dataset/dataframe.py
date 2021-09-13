@@ -1,4 +1,3 @@
-from conf import Config
 from utils import read_csv
 from utils import read_db
 
@@ -23,6 +22,3 @@ class DataFrame:
             pass
         else:
             raise Exception(f'Invalid input type: {input_type}')
-
-
-
