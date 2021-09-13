@@ -4,17 +4,23 @@ from utils import read_db
 
 
 class DataFrame:
-    def __init__(self, config: Config):
-        input_type = config.user_config['input']['type']
+    def __init__(self, input_config):
+        if not input_config:
+            raise "input_config is not allocated. Execute Config.set_input_config()"
+        input_type = input_config['type']
         if input_type == 'file':
             self.df = read_csv(
-                config.user_config['input']['target']
+                input_config['target']
             )
         elif input_type == 'db':
+            # todo
             self.df = read_db(
-                config.general_config['db']['dialect'],
+                input_config['db']['dialect'],
 
             )
+        elif input_type == 'iris':
+            # todo
+            pass
         else:
             raise Exception(f'Invalid input type: {input_type}')
 

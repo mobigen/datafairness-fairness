@@ -9,7 +9,11 @@ from dataset import Dataset
 
 class Metric:
     def __init__(self, dataset, metric_config):
-        self.metric = BinaryLabelDatasetMetric(dataset=dataset, **metric_config)
+        if not metric_config:
+            raise "metric_config is not allocated. Execute Config.set_metric_config()"
+        self.metric = BinaryLabelDatasetMetric(dataset=dataset,
+                                               unprivileged_groups=metric_config['unprivileged_groups'],
+                                               privileged_groups=metric_config['privileged_groups'])
 
     def mean_difference(self):
         return self.metric.mean_difference()
@@ -27,6 +31,7 @@ class Metric:
         return "Not Implemented yet."
 
     def compute_metrics(self):
+
         metrics = {
             'mean_difference': self.mean_difference(),
             'statistical_parity_difference': self.statistical_parity_difference(),

@@ -9,16 +9,18 @@ class Mitigation:
     The choice of which to use depends on whether you want to fix the data (pre-process),
     the classifier (in-process), or the predictions (post-process)
     """
-    def __init__(self, dataset, unprivileged_groups, privileged_groups):
+    def __init__(self, dataset, mitigation_config):
         """
         Args:
             dataset (BinaryLabelDataset): Dataset containing true labels.
             unprivileged_groups (list(dict)): Representation for unprivileged group.
             privileged_groups (list(dict)): Representation for privileged group.
         """
+        if not mitigation_config:
+            raise "mitigation_config is not allocated. Execute Config.set_mitigation_config()"
         self.dataset = dataset
-        self.unprivileged_groups = unprivileged_groups
-        self.privileged_groups = privileged_groups
+        self.unprivileged_groups = mitigation_config['unprivileged_groups']
+        self.privileged_groups = mitigation_config['privileged_groups']
 
     def reweighing(self):
         """Pre-processing

@@ -1,7 +1,7 @@
 from functools import wraps
-from varname import nameof
 import time
 import pandas as pd
+import yaml
 
 
 def with_elapsed(func):
@@ -12,6 +12,11 @@ def with_elapsed(func):
         print(f'[elapsed time] {func.__name__}: {time.time() - start}')
         return result
     return elapsed
+
+
+def load_yaml(file_path):
+    with open(file_path, 'r') as fd:
+        return yaml.load(fd)
 
 
 def read_csv(file_path, delimiter=','):

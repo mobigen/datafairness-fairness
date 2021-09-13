@@ -1,35 +1,26 @@
 import os
-import yaml
+from utils import load_yaml
 
 
 class Config:
-    def __init__(self, general_config_path, user_config_path):
-        self.base_config_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'conf')
+    def __init__(self, config_dir):
+        self.config_dir = config_dir
 
-        self.general_config_path = general_config_path \
-            if general_config_path else os.path.join(self.base_config_dir, 'general_config.yaml')
-        self.user_config_path = user_config_path \
-            if user_config_path else os.path.join(self.base_config_dir, 'user_config.yaml')
+        self.input_config = None
+        self.dataset_config = None
+        self.metric_config = None
+        self.mitigation_config = None
 
-        with open(self.general_config_path, 'r') as fd:
-            self.general_config = yaml.load(fd)
-        with open(self.user_config_path, 'r') as fd:
-            self.user_config = yaml.load(fd)
+    def set_input_config(self, file_name='input.yaml'):
+        if self.input_config:
+            pass
+        self.input_config = load_yaml(os.path.join(self.config_dir, file_name))
 
-        self.general_config_validation()
-        self.user_config_validation()
+    def set_dataset_config(self, file_name='dataset.yaml'):
+        if self.dataset_config:
+            pass
+        dataset_config = load_yaml(os.path.join(self.config_dir, file_name))
 
-        self.dataset_config = self.get_dataset_config()
-        self.metric_config = self.get_metric_config()
-        self.mitigation_config = self.get_mitigation_config()
-
-    def general_config_validation(self):
-        pass
-
-    def user_config_validation(self):
-        pass
-
-    def get_dataset_config(self):
         def _privileged_classes(privileged_classes):
             if isinstance(privileged_classes, str):
                 if privileged_classes.startswith('eval:'):
@@ -47,38 +38,30 @@ class Config:
             else:
                 return [to_list_config]
 
-        # todo: custom_preprocessing ~ validation: callable, input/output=DataFrame
-        exec(self.user_config['dataset']['custom_preprocessing'], globals())
-        if 'custom_preprocessing' in globals():
-            custom_preprocessing = globals()['custom_preprocessing']
-        else:
-            custom_preprocessing = None
+        def _custom_preprocessing():
+            exec(dataset_config['custom_preprocessing'], globals())
+            if 'custom_preprocessing' in globals():
+                return globals()['custom_preprocessing']
+            else:
+                return None
 
-        dataset_config = {
-            'label_name': self.user_config['dataset']['label']['name'],
-            'favorable_classes': self.user_config['dataset']['label']['favorable_classes'],
-            'protected_attribute_names': [attr['name'] for attr in self.user_config['dataset']['protected_attributes']],
-            'privileged_classes': [_privileged_classes(attr['privileged_classes']) for attr in self.user_config['dataset']['protected_attributes']],
-            'categorical_features': _convert_to_list(self.user_config['dataset']['categorical_features']),
-            'features_to_keep': _convert_to_list(self.user_config['dataset']['features_to_keep']),
-            'features_to_drop': _convert_to_list(self.user_config['dataset']['features_to_drop']),
-            'custom_preprocessing': custom_preprocessing
+        self.dataset_config = {
+            'label_name': dataset_config['label']['name'],
+            'favorable_classes': dataset_config['label']['favorable_classes'],
+            'protected_attribute_names': [attr['name'] for attr in dataset_config['protected_attributes']],
+            'privileged_classes': [_privileged_classes(attr['privileged_classes']) for attr in dataset_config['protected_attributes']],
+            'categorical_features': _convert_to_list(dataset_config['categorical_features']),
+            'features_to_keep': _convert_to_list(dataset_config['features_to_keep']),
+            'features_to_drop': _convert_to_list(dataset_config['features_to_drop']),
+            'custom_preprocessing': _custom_preprocessing()
         }
 
-        return dataset_config
+    def set_metric_config(self, file_name='metric.yaml'):
+        if self.metric_config:
+            pass
+        self.metric_config = load_yaml(os.path.join(self.config_dir, file_name))
 
-    def get_metric_config(self):
-        metric_config = {
-            'privileged_groups': self.user_config['metric']['privileged_groups'],
-            'unprivileged_groups': self.user_config['metric']['unprivileged_groups']
-        }
-        return metric_config
-
-    def get_mitigation_config(self):
-        mitigation_config = {
-            'privileged_groups': self.user_config['metric']['privileged_groups'],
-            'unprivileged_groups': self.user_config['metric']['unprivileged_groups']
-        }
-        return mitigation_config
-
-
+    def set_mitigation_config(self, file_name='mitigation.yaml'):
+        if self.mitigation_config:
+            pass
+        self.mitigation_config = load_yaml(os.path.join(self.config_dir, file_name))
