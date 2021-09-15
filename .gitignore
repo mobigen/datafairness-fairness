@@ -1,5 +1,4 @@
 # for all test
-test*
 tmp*
 
 # MacOS
@@ -14,3 +13,6 @@ __pycache__/
 .vscode/
 .ipynb_checkpoints/
 
+/fairness/usecase/sample_data/data2df.py
+/fairness/oreilly-tutorial/
+/fairness/fairness/working_dir/*
