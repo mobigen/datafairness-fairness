@@ -1,25 +1,33 @@
+import json
 import os
-from utils import load_yaml
+
+from fairness.utils import load_yaml
 
 
 class Config:
-    def __init__(self, config_dir):
-        self.config_dir = config_dir
+    def __init__(self, working_dir=None):
+        self.set_working_dir(working_dir)
 
         self.input_config = None
         self.dataset_config = None
         self.metric_config = None
         self.mitigation_config = None
 
-    def set_input_config(self, file_name='input.yaml'):
-        if self.input_config:
-            pass
-        self.input_config = load_yaml(os.path.join(self.config_dir, file_name))
+    def set_working_dir(self, working_dir):
+        if working_dir:
+            self.working_dir = working_dir
+        else:
+            self.working_dir = os.path.join(
+                os.path.dirname(os.path.abspath(os.path.dirname(__file__))), 'working_dir'
+            )
+        if not os.path.exists(self.working_dir):
+            raise f"'working_dir' is not Exists.: {self.working_dir}"
 
-    def set_dataset_config(self, file_name='dataset.yaml'):
-        if self.dataset_config:
-            pass
-        dataset_config = load_yaml(os.path.join(self.config_dir, file_name))
+    def set_input_config(self, file_path='./config/input.yaml'):
+        self.input_config = load_yaml(file_path)
+
+    def set_dataset_config(self, file_path='./config/dataset.yaml'):
+        dataset_config = load_yaml(file_path)
 
         def _privileged_classes(privileged_classes):
             if isinstance(privileged_classes, str):
@@ -56,12 +64,13 @@ class Config:
             'custom_preprocessing': _custom_preprocessing()
         }
 
-    def set_metric_config(self, file_name='metric.yaml'):
-        if self.metric_config:
-            pass
-        self.metric_config = load_yaml(os.path.join(self.config_dir, file_name))
+    def set_metric_config(self, file_path='./config/metric.yaml'):
+        self.metric_config = load_yaml(file_path)
 
-    def set_mitigation_config(self, file_name='mitigation.yaml'):
-        if self.mitigation_config:
-            pass
-        self.mitigation_config = load_yaml(os.path.join(self.config_dir, file_name))
+    def set_mitigation_config(self, file_path='./config/mitigation.yaml'):
+        self.mitigation_config = load_yaml(file_path)
+
+        if not self.metric_config:
+            raise '"metric_config" must be defined first.'
+        self.mitigation_config['unprivileged_groups'] = self.metric_config['unprivileged_groups']
+        self.mitigation_config['privileged_groups'] = self.metric_config['privileged_groups']

@@ -1,7 +1,8 @@
 from functools import wraps
 import time
-import pandas as pd
 import yaml
+import os
+import hashlib
 
 
 def with_elapsed(func):
@@ -16,30 +17,7 @@ def with_elapsed(func):
 
 def load_yaml(file_path):
     with open(file_path, 'r') as fd:
-        return yaml.load(fd)
-
-
-def read_csv(file_path, delimiter=','):
-    df = pd.read_csv(
-        file_path,
-        delimiter=delimiter,
-    )
-    return df
-
-
-def read_db(dialect, ):
-    if dialect == 'mysql':
-        # todo: mysql engine
-        df = None
-        # df = pd.read_sql_table(
-        #
-        # )
-    elif dialect == 'iris':
-        # todo: iris engine
-        df = None
-    else:
-        raise Exception(f'Invalid dialect: "{dialect}"')
-    return df
+        return yaml.load(fd, Loader=yaml.FullLoader)
 
 
 def pretty_print(d, title=None):
@@ -49,3 +27,22 @@ def pretty_print(d, title=None):
     print(f'* {title}')
     for k, v in d.items():
         print(f'    {k}: {v}')
+
+
+def txt2hash(txt):
+    return str(abs(hash(txt)))
+
+
+def mkdir(path):
+    if os.path.exists(os.path.dirname(path)):
+        if not os.path.exists(path):
+            os.mkdir(path)
+    else:
+        raise f"Directory is Not Exists. : {os.path.dirname(path)}"
+
+
+def set_working_dir(parent_dir: str, text: str):
+    _hash = txt2hash(text)
+    working_dir = os.path.join(parent_dir, _hash)
+    mkdir(working_dir)
+    return working_dir

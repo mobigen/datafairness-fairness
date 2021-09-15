@@ -6,11 +6,12 @@ class Metric:
     def __init__(self, dataset, metric_config):
         if not metric_config:
             raise "metric_config is not allocated. Execute Config.set_metric_config()"
-        self.metric_config = metric_config
+        self.config = metric_config
+
         self.metric = BinaryLabelDatasetMetric(
             dataset=dataset,
-            unprivileged_groups=self.metric_config['unprivileged_groups'],
-            privileged_groups=self.metric_config['privileged_groups']
+            unprivileged_groups=self.config['unprivileged_groups'],
+            privileged_groups=self.config['privileged_groups']
         )
 
         # todo:
@@ -25,7 +26,8 @@ class Metric:
 
     def compute_metrics(self):
         metrics = {
-            name: self.__getattribute__(name)() for name in self.metric_config['metrics']
+            # todo: exception
+            name: self.__getattribute__(name)() for name in self.config['metrics']
         }
         return metrics
 

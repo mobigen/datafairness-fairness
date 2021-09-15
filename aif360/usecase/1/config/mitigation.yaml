@@ -1,8 +1,0 @@
-# todo: duplicated with metric config
-# "privileged_groups" and "unprivileged_groups" must be disjoint.
-privileged_groups:
-  - age: 1
-unprivileged_groups:
-  - age: 0
-
-algorithms: reweighing

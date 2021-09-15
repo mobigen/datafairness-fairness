@@ -1,7 +1,12 @@
+import os
+import pickle
+
 from aif360.algorithms.preprocessing import Reweighing
 from aif360.algorithms.preprocessing import OptimPreproc
 from aif360.algorithms.inprocessing import AdversarialDebiasing
 from aif360.algorithms.postprocessing import RejectOptionClassification
+
+from fairness.utils import set_working_dir
 
 
 class Mitigation:
@@ -9,7 +14,7 @@ class Mitigation:
     The choice of which to use depends on whether you want to fix the data (pre-process),
     the classifier (in-process), or the predictions (post-process)
     """
-    def __init__(self, dataset, mitigation_config):
+    def __init__(self, dataset, mitigation_config, dataset_working_dir):
         """
         Args:
             dataset (BinaryLabelDataset): Dataset containing true labels.
@@ -18,9 +23,31 @@ class Mitigation:
         """
         if not mitigation_config:
             raise "mitigation_config is not allocated. Execute Config.set_mitigation_config()"
+        self.config = mitigation_config
+        self.parent_dir = dataset_working_dir
+
         self.dataset = dataset
         self.unprivileged_groups = mitigation_config['unprivileged_groups']
         self.privileged_groups = mitigation_config['privileged_groups']
+
+        self.working_dir = set_working_dir(self.parent_dir, str(self.config))
+
+    def run(self, *args, **kwargs):
+        algorithm = self.config['algorithm']
+        # todo: exception
+        new_dataset = self.__getattribute__(algorithm)(*args, **kwargs)
+        new_df, new_attr = new_dataset.convert_to_dataframe(de_dummy_code=True)
+
+        # todo: exists file treat!!
+        new_dataset_path = os.path.join(self.working_dir, 'dataset.pickle')
+        if os.path.exists(new_dataset_path):
+            with open(new_dataset_path, 'rb') as fd:
+                new_dataset = pickle.load(fd)
+        else:
+            with open(new_dataset_path, 'wb') as fd:
+                pickle.dump(new_dataset, fd)
+
+        return new_dataset
 
     def reweighing(self):
         """Pre-processing

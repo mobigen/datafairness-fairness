@@ -2,7 +2,7 @@ from functools import wraps
 import pandas as pd
 
 import M6
-from utils import with_elapsed
+from fiarness.utils import with_elapsed
 
 
 def iris_connect(func):
