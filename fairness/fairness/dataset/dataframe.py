@@ -13,8 +13,11 @@ class DataFrame:
         self.config = input_config
         self.parent_dir = working_dir
 
+        func_name = f"read_{self.config['type']}"
         # todo: exception
-        self.df = self.__getattribute__(f"read_{self.config['type']}")()
+        # if func_name not in []:
+        #     raise ""
+        self.df = self.__getattribute__(func_name)()
 
         self.working_dir = set_working_dir(self.parent_dir, str(self.df))
 

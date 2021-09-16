@@ -14,7 +14,7 @@ class Dataset:
         self.parent_dir = df_working_dir
 
         self.input_df = df
-        self.working_dir = set_working_dir(self.parent_dir, str(self.config))
+        self.working_dir = set_working_dir(self.parent_dir, str(self.config.pop('_raw')))
         self.dataset = self.make_dataset()
 
     def make_dataset(self):

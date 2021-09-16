@@ -30,7 +30,7 @@ def pretty_print(d, title=None):
 
 
 def txt2hash(txt):
-    return str(abs(hash(txt)))
+    return hashlib.sha256(txt.encode('utf-8')).hexdigest()
 
 
 def mkdir(path):
