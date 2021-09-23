@@ -20,10 +20,14 @@ class Dataset:
     def make_dataset(self):
         dataset_path = os.path.join(self.working_dir, 'dataset.pickle')
         if os.path.exists(dataset_path):
-            with open(dataset_path, 'rb') as fd:
-                dataset = pickle.load(fd)
-        else:
-            dataset = StandardDataset(df=self.input_df, **self.config)
-            with open(dataset_path, 'wb') as fd:
-                pickle.dump(dataset, fd)
+            try:
+                with open(dataset_path, 'rb') as fd:
+                    dataset = pickle.load(fd)
+                return dataset
+            except:
+                pass
+
+        dataset = StandardDataset(df=self.input_df, **self.config)
+        with open(dataset_path, 'wb') as fd:
+            pickle.dump(dataset, fd)
         return dataset

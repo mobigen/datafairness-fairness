@@ -33,6 +33,15 @@ class Mitigation:
         self.working_dir = set_working_dir(self.parent_dir, str(self.config))
 
     def run(self, *args, **kwargs):
+        new_dataset_path = os.path.join(self.working_dir, 'new_dataset.pickle')
+        if os.path.exists(new_dataset_path):
+            try:
+                with open(new_dataset_path, 'rb') as fd:
+                    new_dataset = pickle.load(fd)
+                return new_dataset
+            except:
+                pass
+
         algorithm = self.config['algorithm']
         # todo: exception
         # if algorithm not in []:
@@ -40,13 +49,8 @@ class Mitigation:
         new_dataset = self.__getattribute__(algorithm)(*args, **kwargs)
         # new_df, new_attr = new_dataset.convert_to_dataframe(de_dummy_code=True)
 
-        new_dataset_path = os.path.join(self.working_dir, 'new_dataset.pickle')
-        if os.path.exists(new_dataset_path):
-            with open(new_dataset_path, 'rb') as fd:
-                new_dataset = pickle.load(fd)
-        else:
-            with open(new_dataset_path, 'wb') as fd:
-                pickle.dump(new_dataset, fd)
+        with open(new_dataset_path, 'wb') as fd:
+            pickle.dump(new_dataset, fd)
 
         return new_dataset
 
