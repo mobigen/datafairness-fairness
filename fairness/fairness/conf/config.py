@@ -1,5 +1,6 @@
 import json
 import os
+import copy
 
 from fairness.utils import load_yaml
 
@@ -61,7 +62,8 @@ class Config:
             'categorical_features': _convert_to_list(dataset_config['categorical_features']),
             'features_to_keep': _convert_to_list(dataset_config['features_to_keep']),
             'features_to_drop': _convert_to_list(dataset_config['features_to_drop']),
-            'custom_preprocessing': _custom_preprocessing()
+            'custom_preprocessing': _custom_preprocessing(),
+            '_raw': dataset_config  # for Dataset.working_dir
         }
 
     def set_metric_config(self, file_path='./config/metric.yaml'):

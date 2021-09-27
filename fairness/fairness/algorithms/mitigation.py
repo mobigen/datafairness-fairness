@@ -33,19 +33,24 @@ class Mitigation:
         self.working_dir = set_working_dir(self.parent_dir, str(self.config))
 
     def run(self, *args, **kwargs):
+        new_dataset_path = os.path.join(self.working_dir, 'new_dataset.pickle')
+        if os.path.exists(new_dataset_path):
+            try:
+                with open(new_dataset_path, 'rb') as fd:
+                    new_dataset = pickle.load(fd)
+                return new_dataset
+            except:
+                pass
+
         algorithm = self.config['algorithm']
         # todo: exception
+        # if algorithm not in []:
+        #     raise ""
         new_dataset = self.__getattribute__(algorithm)(*args, **kwargs)
-        new_df, new_attr = new_dataset.convert_to_dataframe(de_dummy_code=True)
+        # new_df, new_attr = new_dataset.convert_to_dataframe(de_dummy_code=True)
 
-        # todo: exists file treat!!
-        new_dataset_path = os.path.join(self.working_dir, 'dataset.pickle')
-        if os.path.exists(new_dataset_path):
-            with open(new_dataset_path, 'rb') as fd:
-                new_dataset = pickle.load(fd)
-        else:
-            with open(new_dataset_path, 'wb') as fd:
-                pickle.dump(new_dataset, fd)
+        with open(new_dataset_path, 'wb') as fd:
+            pickle.dump(new_dataset, fd)
 
         return new_dataset
 
@@ -61,6 +66,7 @@ class Mitigation:
         return dataset_transf
 
     def optimized_preprocessing(self, optimizer, optim_options):
+        # todo: check args and test
         """Pre-processing
         Learns a probabilistic transformation that can modify the features and the labels in the training data.
 
@@ -77,6 +83,7 @@ class Mitigation:
         return dataset_transf
 
     def adversarial_debiasing(self, scope_name, sess):
+        # todo: check args and test
         """In-processing
         Learns a classifier that maximizes prediction accuracy
         and simultaneously reduces an adversary's ability determine the protected attribute from te predictions.
@@ -97,6 +104,7 @@ class Mitigation:
         return dataset_new
 
     def reject_option_based_classification(self, dataset_score):
+        # todo: check args and test
         """Post-processing
         Changes predictions from a classifier to make them fairer.
         Provides favorable outcomes to unprivileged groups

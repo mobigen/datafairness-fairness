@@ -25,9 +25,11 @@ class Metric:
         # )
 
     def compute_metrics(self):
+        # todo: exception
+        # if any([metric not in [] for metric in self.config['metrics']]):
+        #     raise ""
         metrics = {
-            # todo: exception
-            name: self.__getattribute__(name)() for name in self.config['metrics']
+            metric: self.__getattribute__(metric)() for metric in self.config['metrics']
         }
         return metrics
 
