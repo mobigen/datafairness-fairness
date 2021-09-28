@@ -1,6 +1,4 @@
-import json
 import os
-import copy
 
 from fairness.utils import load_yaml
 

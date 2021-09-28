@@ -13,6 +13,6 @@ __pycache__/
 .vscode/
 .ipynb_checkpoints/
 
-/fairness/usecase/sample_data/data2df.py
+/fairness/src/sample/sample_data/data2df.py
 /fairness/oreilly-tutorial/
-/fairness/fairness/working_dir/*
+/fairness/src/fairness/working_dir/*

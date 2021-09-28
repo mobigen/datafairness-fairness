@@ -16,6 +16,7 @@ class Dataset:
         self.input_df = df
         self.working_dir = set_working_dir(self.parent_dir, str(self.config.pop('_raw')))
         self.dataset = self.make_dataset()
+        # self.df, self.attr = self.dataset.convert_to_dataframe(de_dummy_code=True)
 
     def make_dataset(self):
         dataset_path = os.path.join(self.working_dir, 'dataset.pickle')
