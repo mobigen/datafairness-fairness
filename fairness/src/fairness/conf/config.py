@@ -1,6 +1,6 @@
 import os
 
-from fairness.utils import load_yaml
+from fairness.utils import get_config
 
 
 class Config:
@@ -22,11 +22,11 @@ class Config:
         if not os.path.exists(self.working_dir):
             raise f"'working_dir' is not Exists.: {self.working_dir}"
 
-    def set_input_config(self, file_path='./config/input.yaml'):
-        self.input_config = load_yaml(file_path)
+    def set_input_config(self, config):
+        self.input_config = get_config(config)
 
-    def set_dataset_config(self, file_path='./config/dataset.yaml'):
-        dataset_config = load_yaml(file_path)
+    def set_dataset_config(self, config):
+        dataset_config = get_config(config)
 
         def _privileged_classes(privileged_classes):
             if isinstance(privileged_classes, str):
@@ -64,11 +64,11 @@ class Config:
             '_raw': dataset_config  # for Dataset.working_dir
         }
 
-    def set_metric_config(self, file_path='./config/metric.yaml'):
-        self.metric_config = load_yaml(file_path)
+    def set_metric_config(self, config):
+        self.metric_config = get_config(config)
 
-    def set_mitigation_config(self, file_path='./config/mitigation.yaml'):
-        self.mitigation_config = load_yaml(file_path)
+    def set_mitigation_config(self, config):
+        self.mitigation_config = get_config(config)
 
         if not self.metric_config:
             raise '"metric_config" must be defined first.'
