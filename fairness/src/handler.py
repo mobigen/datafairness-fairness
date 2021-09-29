@@ -13,26 +13,32 @@ def Handler(req):
     start = time.time()
     recv_msg = json.loads(req.input)
 
-    input_test = recv_msg['input_test']
-
     config = Config()
 
+    iris_config = {
+        "iris": {
+            "addr": "192.168.101.108",
+            "user": "fair",
+            "password": "!cool@fairness#4",
+            "database": "FAIR"
+        }
+    }
+    recv_msg['input'].update(iris_config)
+
     ## load data
-    config.set_input_config('./sample/1/config/input.yaml')
+    config.set_input_config(recv_msg['input'])
     df = DataFrame(config.input_config, config.working_dir)
 
-    config.set_dataset_config('./sample/1/config/dataset.yaml')
+    config.set_dataset_config(recv_msg['dataset'])
     dataset = Dataset(df.df, config.dataset_config, df.working_dir)
-    # train_data, test_data = dataset.split([0.7], shuffle=True)
-    # train_df, train_attr = train_data.convert_to_dataframe()
 
     ## check bias metrics (before mitigation ~ original data)
-    config.set_metric_config('./sample/1/config/metric.yaml')
+    config.set_metric_config(recv_msg['metric'])
     metrics = Metric(dataset.dataset, config.metric_config).compute_metrics()
     pretty_print(metrics, 'Original Metrics')
 
     ## mitigation (Reweighing)
-    config.set_mitigation_config('./sample/1/config/mitigation.yaml')
+    config.set_mitigation_config(recv_msg['mitigation'])
     mitigation = Mitigation(dataset.dataset, config.mitigation_config, dataset.working_dir)
     # dataset_new = mitigation.reweighing()
     dataset_new = mitigation.run()
@@ -46,8 +52,7 @@ def Handler(req):
         'metrics': {
             'before': metrics,
             'after': metrics_new
-        },
-        'input_test': input_test
+        }
     }
 
     print("elapsed time : {}".format(time.time() - start))
