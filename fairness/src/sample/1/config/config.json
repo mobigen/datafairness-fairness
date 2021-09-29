@@ -1,0 +1,57 @@
+{
+  "input": {
+    "type": "iris",
+    "target": "test_data_german"
+  },
+  "dataset": {
+    "label": {
+      "name": "credit",
+      "favorable_classes": [1]
+    },
+    "protected_attributes": [
+      {
+        "name": "sex",
+        "privileged_classes": ["male"]
+      },
+      {
+        "name": "age",
+        "privileged_classes": "eval: x > 25"
+      }
+    ],
+    "categorical_features": [
+      "status",
+      "credit_history",
+      "purpose",
+      "savings",
+      "employment",
+      "other_debtors",
+      "property",
+      "installment_plans",
+      "housing",
+      "skill_level",
+      "telephone",
+      "foreign_worker"
+    ],
+    "features_to_keep": null,
+    "features_to_drop": [
+      "personal_status"
+    ],
+    "custom_preprocessing": "def custom_preprocessing(df):   # f: pd.DataFrame -> pd.DataFrame. default is None\n    status_map = {'A91': 'male', 'A93': 'male', 'A94': 'male',\n                  'A92': 'female', 'A95': 'female'}\n    df['sex'] = df['personal_status'].replace(status_map)\n\n    return df"
+  },
+  "metric": {
+    "privileged_groups": [
+      {"age": 1}
+    ],
+    "unprivileged_groups": [
+      {"age": 0}
+    ],
+    "metrics": [
+      "mean_difference",
+      "statistical_parity_difference",
+      "disparate_impact"
+    ]
+  },
+  "mitigation": {
+    "algorithm": "reweighing"
+  }
+}

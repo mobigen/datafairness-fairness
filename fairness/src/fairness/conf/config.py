@@ -1,6 +1,7 @@
 import os
 
-from fairness.utils import load_yaml
+from fairness.utils import get_config
+from fairness.utils import InvalidConfigException
 
 
 class Config:
@@ -22,31 +23,33 @@ class Config:
         if not os.path.exists(self.working_dir):
             raise f"'working_dir' is not Exists.: {self.working_dir}"
 
-    def set_input_config(self, file_path='./config/input.yaml'):
-        self.input_config = load_yaml(file_path)
+    def set_input_config(self, config):
+        self.input_config = get_config(config)
 
-    def set_dataset_config(self, file_path='./config/dataset.yaml'):
-        dataset_config = load_yaml(file_path)
+    def set_dataset_config(self, config):
+        dataset_config = get_config(config)
 
         def _privileged_classes(privileged_classes):
             if isinstance(privileged_classes, str):
                 if privileged_classes.startswith('eval:'):
                     return eval(f'lambda x: {privileged_classes.split(":")[-1]}')
+                else:
+                    raise InvalidConfigException("'privileged_classes' string condition must be starts with 'eval:'")
             if not isinstance(privileged_classes, list):
                 return [privileged_classes]
             else:
                 return privileged_classes
 
-        def _convert_to_list(to_list_config):
-            if isinstance(to_list_config, list):
-                return to_list_config
-            elif not to_list_config:
+        def _to_list(to_list):
+            if isinstance(to_list, list):
+                return to_list
+            elif not to_list:
                 return []
             else:
-                return [to_list_config]
+                return [to_list]
 
         def _custom_preprocessing():
-            exec(dataset_config['custom_preprocessing'], globals())
+            exec(dataset_config.get('custom_preprocessing', ''), globals())
             if 'custom_preprocessing' in globals():
                 return globals()['custom_preprocessing']
             else:
@@ -57,20 +60,20 @@ class Config:
             'favorable_classes': dataset_config['label']['favorable_classes'],
             'protected_attribute_names': [attr['name'] for attr in dataset_config['protected_attributes']],
             'privileged_classes': [_privileged_classes(attr['privileged_classes']) for attr in dataset_config['protected_attributes']],
-            'categorical_features': _convert_to_list(dataset_config['categorical_features']),
-            'features_to_keep': _convert_to_list(dataset_config['features_to_keep']),
-            'features_to_drop': _convert_to_list(dataset_config['features_to_drop']),
+            'categorical_features': _to_list(dataset_config.get('categorical_features', [])),
+            'features_to_keep': _to_list(dataset_config.get('features_to_keep', [])),
+            'features_to_drop': _to_list(dataset_config.get('features_to_drop', [])),
             'custom_preprocessing': _custom_preprocessing(),
             '_raw': dataset_config  # for Dataset.working_dir
         }
 
-    def set_metric_config(self, file_path='./config/metric.yaml'):
-        self.metric_config = load_yaml(file_path)
+    def set_metric_config(self, config):
+        self.metric_config = get_config(config)
 
-    def set_mitigation_config(self, file_path='./config/mitigation.yaml'):
-        self.mitigation_config = load_yaml(file_path)
+    def set_mitigation_config(self, config):
+        self.mitigation_config = get_config(config)
 
         if not self.metric_config:
-            raise '"metric_config" must be defined first.'
+            raise InvalidConfigException('"metric_config" must be defined first.')
         self.mitigation_config['unprivileged_groups'] = self.metric_config['unprivileged_groups']
         self.mitigation_config['privileged_groups'] = self.metric_config['privileged_groups']

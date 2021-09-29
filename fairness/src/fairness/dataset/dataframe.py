@@ -4,19 +4,17 @@ import numpy as np
 
 from fairness.utils import set_working_dir
 from fairness.IRIS_API import M6
+from fairness.utils import InvalidConfigException
 
 
 class DataFrame:
     def __init__(self, input_config, working_dir):
         if not input_config:
-            raise "'input_config' is not allocated. Execute Config.set_input_config()"
+            raise InvalidConfigException("'input_config' is not allocated. Execute Config.set_input_config()")
         self.config = input_config
         self.parent_dir = working_dir
 
         func_name = f"read_{self.config['type']}"
-        # todo: exception
-        # if func_name not in []:
-        #     raise ""
         self.df = self.__getattribute__(func_name)()
 
         self.working_dir = set_working_dir(self.parent_dir, str(self.df))

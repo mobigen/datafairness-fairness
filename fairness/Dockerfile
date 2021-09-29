@@ -1,7 +1,6 @@
 # Arguments from FROM
 ARG REGISTRY
 
-#FROM python:3.6-alpine
 FROM ${REGISTRY}/fxwatcher:ubuntu-python3
 
 ARG handler_file=handler.py
@@ -21,7 +20,6 @@ RUN pip install -r ./requirements.txt
 
 COPY ./src/handler.py ./handler.py
 COPY ./src/fairness ./fairness
-COPY ./src/sample ./sample
 
 RUN touch ${HANDLER_DIR}/__init__.py
 

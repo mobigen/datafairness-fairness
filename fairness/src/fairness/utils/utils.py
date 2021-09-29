@@ -20,6 +20,14 @@ def load_yaml(file_path):
         return yaml.load(fd, Loader=yaml.FullLoader)
 
 
+def get_config(config):
+    if isinstance(config, dict):
+        return config
+    elif isinstance(config, str):
+        if os.path.isfile(config):
+            return load_yaml(config)
+
+
 def pretty_print(d, title=None):
     if not isinstance(d, dict):
         raise ValueError("'d' must be dict.")
