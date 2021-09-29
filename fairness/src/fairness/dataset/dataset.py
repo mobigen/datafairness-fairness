@@ -4,12 +4,13 @@ import pickle
 from aif360.datasets import StandardDataset
 
 from fairness.utils import set_working_dir
+from fairness.utils import InvalidConfigException
 
 
 class Dataset:
     def __init__(self, df: pd.DataFrame, dataset_config, df_working_dir):
         if not dataset_config:
-            raise "dataset_config is not allocated. Execute Config.set_dataset_config()"
+            raise InvalidConfigException("dataset_config is not allocated. Execute Config.set_dataset_config()")
         self.config = dataset_config
         self.parent_dir = df_working_dir
 

@@ -1,11 +1,12 @@
 from aif360.metrics import BinaryLabelDatasetMetric
 from aif360.metrics import ClassificationMetric
+from fairness.utils import InvalidConfigException
 
 
 class Metric:
     def __init__(self, dataset, metric_config):
         if not metric_config:
-            raise "metric_config is not allocated. Execute Config.set_metric_config()"
+            raise InvalidConfigException("metric_config is not allocated. Execute Config.set_metric_config()")
         self.config = metric_config
 
         self.metric = BinaryLabelDatasetMetric(
@@ -25,9 +26,6 @@ class Metric:
         # )
 
     def compute_metrics(self):
-        # todo: exception
-        # if any([metric not in [] for metric in self.config['metrics']]):
-        #     raise ""
         metrics = {
             metric: self.__getattribute__(metric)() for metric in self.config['metrics']
         }

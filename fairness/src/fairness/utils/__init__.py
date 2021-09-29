@@ -5,3 +5,4 @@ from fairness.utils.utils import get_config
 from fairness.utils.utils import txt2hash
 from fairness.utils.utils import mkdir
 from fairness.utils.utils import set_working_dir
+from fairness.utils.exception import InvalidConfigException

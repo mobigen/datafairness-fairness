@@ -7,6 +7,7 @@ from aif360.algorithms.inprocessing import AdversarialDebiasing
 from aif360.algorithms.postprocessing import RejectOptionClassification
 
 from fairness.utils import set_working_dir
+from fairness.utils import InvalidConfigException
 
 
 class Mitigation:
@@ -22,7 +23,7 @@ class Mitigation:
             privileged_groups (list(dict)): Representation for privileged group.
         """
         if not mitigation_config:
-            raise "mitigation_config is not allocated. Execute Config.set_mitigation_config()"
+            raise InvalidConfigException("mitigation_config is not allocated. Execute Config.set_mitigation_config()")
         self.config = mitigation_config
         self.parent_dir = dataset_working_dir
 
@@ -43,9 +44,6 @@ class Mitigation:
                 pass
 
         algorithm = self.config['algorithm']
-        # todo: exception
-        # if algorithm not in []:
-        #     raise ""
         new_dataset = self.__getattribute__(algorithm)(*args, **kwargs)
         # new_df, new_attr = new_dataset.convert_to_dataframe(de_dummy_code=True)
 
