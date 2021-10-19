@@ -63,7 +63,7 @@ def Handler(req):
         print("elapsed time : {}".format(time.time() - start))
     except Exception as e:
         results = {
-            "result": "SUCCESS",
+            "result": "FAIL",
             "reason": f"{e.__class__.__name__}: {str(e)}"
         }
     return str.encode(json.dumps(results, indent=3, ensure_ascii=False))
