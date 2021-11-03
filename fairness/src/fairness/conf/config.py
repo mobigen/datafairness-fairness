@@ -33,8 +33,6 @@ class Config:
             if isinstance(privileged_classes, str):
                 if privileged_classes.startswith('eval:'):
                     return eval(f'lambda x: {privileged_classes.split(":")[-1]}')
-                else:
-                    raise InvalidConfigException("'privileged_classes' string condition must be starts with 'eval:'")
             if not isinstance(privileged_classes, list):
                 return [privileged_classes]
             else:

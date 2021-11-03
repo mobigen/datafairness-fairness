@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn import metrics
 
 from ENN import iris
+from ENN.visualize import Visualize
 
 
 # resample minority class.
@@ -45,6 +46,9 @@ results = {
         'before': label_counts.to_dict()
     }
 }
+
+vis = Visualize(recv_msg['label'], minority_class, majority_class)
+vis.add_data(df, 'raw')
 
 minority = df[df[recv_msg['label']] == minority_class].copy()
 majority = df[df[recv_msg['label']] == majority_class].copy()
@@ -85,6 +89,10 @@ while count < n:
 
 df[recv_msg['label']] = df[recv_msg['label']].astype(type(minority_class))
 
+vis.add_data(df, 'after_smote')
+
+
+
 after_smote_x = df.drop(recv_msg['label'], axis=1)
 after_smote_y = df[recv_msg['label']].values
 
@@ -98,20 +106,31 @@ issame = (after_smote_y_pred == after_smote_y_answer)
 drop_index = after_smote_x.index[np.where(issame==False)]
 df = df.drop(index=drop_index, axis=0)
 
+vis.add_data(df, 'after_enn')
+
 label_counts = pd.DataFrame({'count': df[recv_msg['label']].value_counts()})
 label_counts['rates'] = round(label_counts / label_counts.sum(), 2)
 results['counts']['after'] = label_counts.to_dict()
 
-# print(json.dumps(results, indent=2))
-print(pd.DataFrame(results['counts']).T)
 
+### imblearn SMOTEENN
+from imblearn.combine import SMOTEENN
+from sklearn.ensemble import AdaBoostClassifier
+from imblearn.pipeline import Pipeline
 
+sme = SMOTEENN()
+x_res, y_res = sme.fit_resample(x, y)
 
-# todo: versus imblearn SMOTEENN
-# from imblearn.combine import SMOTEENN
-# from sklearn.ensemble import AdaBoostClassifier
-# from imblearn.pipeline import Pipeline
-#
-# sme = SMOTEENN()
-# x_res, y_res = sme.fit_resample(x_train, y_train)
+vis.add_data(pd.concat([x_res, pd.Series(y_res, name=recv_msg['label'])], axis=1), 'imblearn_SMOTEENN')
 
+label_counts = pd.DataFrame({'count': pd.Series(y_res).value_counts()})
+label_counts['rates'] = round(label_counts / label_counts.sum(), 2)
+results['counts']['imblearn'] = label_counts.to_dict()
+
+vis.dim_reduction()
+
+vis.scatter_plot('raw')
+vis.scatter_plot('after_smote')
+vis.scatter_plot('after_enn')
+
+vis.scatter_plot('imblearn_SMOTEENN')

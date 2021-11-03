@@ -16,7 +16,7 @@ import numpy as np
 # In[3]:
 
 
-df_raw = pd.read_csv('diabetes.csv')
+df_raw = pd.read_csv('./sj-univ/diabetes.csv')
 df_raw
 
 # In[4]:
@@ -136,7 +136,7 @@ while True:
 
     new_index = count + len(df)
     # oversampling 값에 index 번호를 매긴다.
-    print(count, len(df), new_index, new_index in df_train.index)
+    # print(count, len(df), new_index, new_index in df_train.index)
 
     df_train.loc[new_index, :] = new_index_value
     # DataFrame에 oversampling된 값을 넣는다.ㅇ

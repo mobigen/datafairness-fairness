@@ -40,10 +40,17 @@
   },
   "metric": {
     "privileged_groups": [
-      {"age": 1}
+      {
+        "age": 0, "sex": 1
+      }
     ],
     "unprivileged_groups": [
-      {"age": 0}
+      {
+        "age": 1, "sex": 1
+      },
+      {
+        "sex": 0
+      }
     ],
     "metrics": [
       "mean_difference",
