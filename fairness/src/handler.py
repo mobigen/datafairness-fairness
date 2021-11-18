@@ -7,6 +7,7 @@ from fairness.dataset import Dataset
 from fairness.metric import Metric
 from fairness.algorithms import Mitigation
 from fairness.utils import pretty_print
+from fairness.utils import ProtectedAttributes, Groups
 
 
 def Handler(req):
@@ -48,16 +49,22 @@ def Handler(req):
 
             ## check bias metrics (after mitigation)
             metrics_new = Metric(dataset_new, config.metric_config).compute_metrics()
+            _mitigation = recv_msg['mitigation']['algorithm']
             pretty_print(metrics_new, 'Mitigated Metrics ~ Reweighing')
         else:
             metrics_new = None
+            _mitigation = None
 
         results = {
             'result': 'SUCCESS',
+            'protected_attributes': ProtectedAttributes(recv_msg)(),
+            'privileged_groups': Groups(recv_msg, privileged=True)(),
+            'unprivileged_groups': Groups(recv_msg, privileged=False)(),
             'metrics': {
                 'before': metrics,
                 'after': metrics_new
-            }
+            },
+            'mitigation': _mitigation
         }
 
         print("elapsed time : {}".format(time.time() - start))
