@@ -15,7 +15,7 @@ class DataFrame:
         self.parent_dir = working_dir
 
         func_name = f"read_{self.config['type']}"
-        self.df = self.__getattribute__(func_name)()
+        self.df, self.columns = self.__getattribute__(func_name)()
 
         self.working_dir = set_working_dir(self.parent_dir, str(self.df))
 
@@ -24,7 +24,8 @@ class DataFrame:
             self.config['target'],
             delimiter=self.config.get('delimiter', ','),
         )
-        return df
+        columns = list(df.columns)
+        return df, columns
 
     def read_mysql(self):
         engine = create_engine(
@@ -32,7 +33,8 @@ class DataFrame:
         )
         with engine.connect() as conn:
             df = pd.read_sql_table(self.config['target'], conn)
-        return df
+        columns = list(df.columns)
+        return df, columns
 
     def read_iris(self):
         conn = M6.Connection(
@@ -46,15 +48,16 @@ class DataFrame:
         _columns = np.array(cursor.Fetchall())
         _row_condition = _columns[:, 2] == f'{self.config["target"].upper()}'
         columns = _columns[_row_condition, 3]
+        columns = [c.lower() for c in columns]
 
         cursor.Close()
         conn.close()
 
-        df = pd.DataFrame(data, columns=[c.lower() for c in columns])
+        df = pd.DataFrame(data, columns=columns)
         for c in df.columns:
             try:
                 df[c] = pd.to_numeric(df[c])
             except:
                 pass
-        return df
+        return df, columns
 
