@@ -32,7 +32,7 @@ pretty_print(metrics, 'Original Metrics')
 config.set_mitigation_config('./config/mitigation.yaml')
 mitigation = Mitigation(dataset.dataset, config.mitigation_config, dataset.working_dir)
 # dataset_new = mitigation.reweighing()
-dataset_new = mitigation.run()
+dataset_new, res = mitigation.run()
 # new_df, new_attr = dataset_new.convert_to_dataframe()
 
 ## check bias metrics (after mitigation)

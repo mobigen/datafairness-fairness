@@ -1,6 +1,8 @@
 import pandas as pd
 import os
 import pickle
+import numpy as np
+import copy
 from aif360.datasets import StandardDataset
 
 from fairness.utils import set_working_dir
@@ -14,7 +16,7 @@ class Dataset:
         self.config = dataset_config
         self.parent_dir = df_working_dir
 
-        self.input_df = df
+        self.df = df
         self.working_dir = set_working_dir(self.parent_dir, str(self.config.pop('_raw')))
         self.dataset = self.make_dataset()
         # self.df, self.attr = self.dataset.convert_to_dataframe(de_dummy_code=True)
@@ -29,7 +31,20 @@ class Dataset:
             except:
                 pass
 
-        dataset = StandardDataset(df=self.input_df, **self.config)
+        for col in self.df.columns:
+            if col == self.config['label_name'] \
+                or col in self.config['protected_attribute_names'] \
+                or col in self.config['features_to_keep'] \
+                or col in self.config['features_to_drop'] \
+                or col in self.config['categorical_features']:
+                continue
+            try:
+                self.df[col].astype(np.float64)
+            except ValueError:
+                self.config['features_to_drop'].append(col)
+        self.config['features_to_drop'] = list(set(self.config['features_to_drop']))
+
+        dataset = StandardDataset(df=self.df, **self.config)
         with open(dataset_path, 'wb') as fd:
             pickle.dump(dataset, fd)
         return dataset

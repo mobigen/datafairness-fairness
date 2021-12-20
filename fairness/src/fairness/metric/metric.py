@@ -1,5 +1,7 @@
 from aif360.metrics import BinaryLabelDatasetMetric
 from aif360.metrics import ClassificationMetric
+from aif360.datasets import StandardDataset
+
 from fairness.utils import InvalidConfigException
 
 
@@ -16,14 +18,18 @@ class Metric:
         )
 
         # todo:
+        #   dataset (BinaryLabelDataset): Dataset containing ground-truth labels.
         #   classified_dataset (BinaryLabelDataset): Dataset containing predictions.
         classified_dataset = None
-        # self.cls_metric = ClassificationMetric(
-        #     dataset=dataset,
-        #     classified_dataset=classified_dataset,
-        #     unprivileged_groups=self.metric_config['unprivileged_groups'],
-        #     privileged_groups=self.metric_config['privileged_groups']
-        # )
+        if isinstance(classified_dataset, StandardDataset):
+            self.cls_metric = ClassificationMetric(
+                dataset=dataset,
+                classified_dataset=classified_dataset,
+                unprivileged_groups=self.config['unprivileged_groups'],
+                privileged_groups=self.config['privileged_groups']
+            )
+        else:
+            self.cls_metric = None
 
     def compute_metrics(self):
         metrics = {
@@ -32,23 +38,20 @@ class Metric:
         return metrics
 
     def mean_difference(self):
-        # chk: self.cls_metric.mean_difference()
-        return self.metric.mean_difference()
+        return self.statistical_parity_difference()
 
     def statistical_parity_difference(self):
-        # chk: self.cls_metric.statistical_parity_difference()
         return self.metric.statistical_parity_difference()
 
     def disparate_impact(self):
-        # chk: self.cls_metric.disparate_impact()
         return self.metric.disparate_impact()
 
     def equal_opportunity_difference(self):
-        # todo:
-        #   return self.cls_metric.equal_opportunity_difference()
-        return "Not Implemented yet."
+        if self.cls_metric is None:
+            return "must set 'classified_dataset'"
+        return self.cls_metric.equal_opportunity_difference()
 
     def average_odds_difference(self):
-        # todo:
-        #   return self.cls_metric.average_odds_difference()
-        return "Not Implemented yet."
+        if self.cls_metric is None:
+            return "must set 'classified_dataset'"
+        return self.cls_metric.average_odds_difference()
