@@ -41,13 +41,10 @@
   "metric": {
     "privileged_groups": [
       {
-        "age": 0, "sex": 1
+        "sex": 1
       }
     ],
     "unprivileged_groups": [
-      {
-        "age": 1, "sex": 1
-      },
       {
         "sex": 0
       }
@@ -55,7 +52,8 @@
     "metrics": [
       "mean_difference",
       "statistical_parity_difference",
-      "disparate_impact"
+      "disparate_impact",
+      "equal_opportunity_difference"
     ]
   },
   "mitigation": {

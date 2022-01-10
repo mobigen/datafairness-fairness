@@ -75,3 +75,4 @@ class Config:
             raise InvalidConfigException('"metric_config" must be defined first.')
         self.mitigation_config['unprivileged_groups'] = self.metric_config['unprivileged_groups']
         self.mitigation_config['privileged_groups'] = self.metric_config['privileged_groups']
+        self.mitigation_config['label_name'] = self.dataset_config['label_name']

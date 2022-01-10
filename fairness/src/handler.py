@@ -21,25 +21,21 @@ def run(config, args):
     ## check bias metrics (before mitigation ~ original data)
     config.set_metric_config(args['metric'])
     metrics = Metric(dataset.dataset, config.metric_config).compute_metrics()
-    pretty_print(metrics, 'Original Metrics')
 
     if args.__contains__('mitigation'):
-        ## mitigation (Reweighing)
         config.set_mitigation_config(args['mitigation'])
         mitigation = Mitigation(dataset.dataset, config.mitigation_config, dataset.working_dir)
-        # dataset_new = mitigation.reweighing()
-        dataset_new = mitigation.run()
-        # new_df, new_attr = dataset_new.convert_to_dataframe()
+        dataset_transf, mitigation_results = mitigation.run()
 
         ## check bias metrics (after mitigation)
-        metrics_new = Metric(dataset_new, config.metric_config).compute_metrics()
+        metrics_new = Metric(dataset_transf, config.metric_config).compute_metrics()
         _mitigation = args['mitigation']['algorithm']
-        pretty_print(metrics_new, 'Mitigated Metrics ~ Reweighing')
     else:
         metrics_new = None
         _mitigation = None
+        dataset_transf, mitigation_results = None, None
 
-    return metrics, metrics_new, _mitigation
+    return metrics, metrics_new, _mitigation, dataset_transf, mitigation_results
 
 
 def Handler(req):
@@ -61,7 +57,7 @@ def Handler(req):
         args = recv_msg['args']
         if mode == 'run':
             args['input'].update(iris_config)
-            metrics, metrics_new, _mitigation = run(config, args)
+            metrics, metrics_new, _mitigation, dataset_transf, mitigation_results = run(config, args)
 
             results = {
                 'result': 'SUCCESS',
@@ -72,7 +68,8 @@ def Handler(req):
                     'before': metrics,
                     'after': metrics_new
                 },
-                'mitigation': _mitigation
+                'mitigation': _mitigation,
+                'mitigation_res': mitigation_results    # todo: merge with above key ~ merge - name, results
             }
         elif mode == 'table_info':
             args['input'].update(iris_config)
